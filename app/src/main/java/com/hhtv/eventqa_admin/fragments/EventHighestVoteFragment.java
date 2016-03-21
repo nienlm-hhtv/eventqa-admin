@@ -169,7 +169,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
 
 
     @Override
-    public void onAnsBtnClick(int id) {
+    public void onAnsBtnClick(final int id) {
         //mAdapter.removeItem(id);
         mDialog.show();
         Call<MarkQuestionResponse> call = api.markQuestionAnswered(UserUtils.getUserId(getContext()), id);
@@ -181,6 +181,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                     Log.d("MYTAG2","ans: " + response.raw().request().url());
                     Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
                     if (response.body().isSuccess()) {
+                        mAdapter.removeItem(id);
                         ((EventDetailActivity) getActivity()).reloadContent();
                     }
                 } else {
@@ -197,7 +198,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
     }
 
     @Override
-    public void onDelBtnClick(int id) {
+    public void onDelBtnClick(final int id) {
         //mAdapter.removeItem(id);
         mDialog.show();
         Call<MarkQuestionResponse> call = api.markQuestionDeleted(UserUtils.getUserId(getContext()), id);
@@ -207,6 +208,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                 mDialog.dismiss();
                 Log.d("MYTAG2","del: " + response.raw().request().url());
                 if (response.isSuccess()) {
+                    mAdapter.removeItem(id);
                     Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
                     if (response.body().isSuccess()) {
                         ((EventDetailActivity) getActivity()).reloadContent();
@@ -224,7 +226,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
     }
 
     @Override
-    public void onDupBtnClick(int id) {
+    public void onDupBtnClick(final int id) {
         //mAdapter.removeItem(id);
         mDialog.show();
         Call<MarkQuestionResponse> call = api.markQuestionDuplicated(UserUtils.getUserId(getContext()), id);
@@ -234,6 +236,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                 mDialog.dismiss();
                 Log.d("MYTAG2","dup: " + response.raw().request().url());
                 if (response.isSuccess()) {
+                    mAdapter.removeItem(id);
                     Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
                     if (response.body().isSuccess()) {
                         ((EventDetailActivity) getActivity()).reloadContent();

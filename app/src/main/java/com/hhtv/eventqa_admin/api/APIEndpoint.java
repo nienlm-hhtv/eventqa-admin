@@ -6,12 +6,15 @@ import com.hhtv.eventqa_admin.models.question.MarkQuestionResponse;
 import com.hhtv.eventqa_admin.models.question.Question;
 import com.hhtv.eventqa_admin.models.question.Vote;
 import com.hhtv.eventqa_admin.models.user.GetUserResponse;
+import com.squareup.okhttp.RequestBody;
 
 import retrofit.Call;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
+import retrofit.http.Multipart;
 import retrofit.http.POST;
+import retrofit.http.Part;
 import retrofit.http.Query;
 
 /**
@@ -23,6 +26,15 @@ public interface APIEndpoint {
     @FormUrlEncoded
     @POST("/api/event/getUser")
     Call<GetUserResponse> getUser(@Field("username") String username, @Field("password") String password);
+
+    @Multipart
+    @FormUrlEncoded
+    @POST("/api/event/editEvent")
+    Call<String> updateEvent(@Part("event_name") String event_name,
+                             @Part("description") String description,
+                             @Part("start_date") String start_date,
+                             @Part("end_date") String end_date,
+                             @Part("image")RequestBody image);
 
     @GET("/api/event/getEventDetail")
     Call<Result> getEvent(@Query("id") int eventid);
@@ -47,6 +59,7 @@ public interface APIEndpoint {
     Call<MarkQuestionResponse> markQuestionDuplicated(@Query("user_id") int user_id, @Query("question_id") int question_id);
     @GET("/api/event/getEvents")
     Call<Event> getEvents(@Query("user_id") int user_id);
+
 
 
     /*//TODO remove fake method

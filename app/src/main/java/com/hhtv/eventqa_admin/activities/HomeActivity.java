@@ -80,7 +80,7 @@ public class HomeActivity extends AppCompatActivity {
 
     public void login() {
         loadingDialog.show();
-        mHomeBtnLogin.setEnabled(false);
+
 
         String email = mHomeInputEmail.getText().toString();
         String password = mHomeInputPassword.getText().toString();
@@ -115,13 +115,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void onLoginSuccess() {
-        mHomeBtnLogin.setEnabled(true);
+
 
     }
 
     public void onLoginFailed() {
         //Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
-        mHomeBtnLogin.setEnabled(true);
+
     }
     public boolean validate() {
         boolean valid = true;

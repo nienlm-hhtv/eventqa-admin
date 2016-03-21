@@ -35,12 +35,17 @@ import com.hhtv.eventqa_admin.helpers.MyCallBack;
 import com.hhtv.eventqa_admin.helpers.NetworkFailBuilder;
 import com.hhtv.eventqa_admin.models.event.Result;
 import com.hhtv.eventqa_admin.models.user.GetUserResponse;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.picasso.Picasso;
+
+import java.io.File;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import retrofit.Call;
+import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 
@@ -59,6 +64,8 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
     EditText eeditDescription;
     @Bind(R.id.eedit_startat)
     TextView eeditStartat;
+    @Bind(R.id.eedit_endat)
+    TextView eeditEndat;
     @Bind(R.id.eedit_starttime)
     TextView eeditStarttime;
     @Bind(R.id.eedit_endtime)
@@ -73,6 +80,8 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
     Button eeditSave;
     @Bind(R.id.eedit_startat_btn)
     Button eeditStartAtBtn;
+    @Bind(R.id.eedit_endat_btn)
+    Button eeditEndAtBtn;
     @Bind(R.id.eedit_starttime_btn)
     Button eeditStartTimeBTn;
     @Bind(R.id.eedit_endtime_btn)
@@ -86,16 +95,37 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
         ButterKnife.unbind(this);
     }
     MaterialDialog d;
+    boolean isUserSelectNewImage = false;
     private static final String FRAG_TAG_DATE_PICKER = "fragment_date_picker_name";
     private static final String FRAG_TAG_TIME_PICKER = "timePickerDialogFragment";
-    @OnClick({R.id.eedit_delete, R.id.eedit_startat_btn, R.id.eedit_starttime_btn, R.id.eedit_img, R.id.eedit_qrcode, R.id.eedit_back, R.id.eedit_save})
+    @OnClick({R.id.eedit_endtime_btn, R.id.eedit_endat_btn, R.id.eedit_delete, R.id.eedit_startat_btn, R.id.eedit_starttime_btn, R.id.eedit_img, R.id.eedit_qrcode, R.id.eedit_back, R.id.eedit_save})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.eedit_startat_btn:
                 CalendarDatePickerDialogFragment cdp = new CalendarDatePickerDialogFragment()
-                        .setOnDateSetListener(EditEventFragment.this)
+                        .setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
+                                String month  = ((monthOfYear + 1) < 10)? "0" + (monthOfYear + 1) : (monthOfYear+1)+"";
+                                String day = (dayOfMonth < 10)? "0" + dayOfMonth : "" + dayOfMonth;
+                                eeditStartat.setText(year + "-" + month + "-" + day);
+                            }
+                        })
                         .setThemeLight();
                 cdp.show(getActivity().getSupportFragmentManager(),FRAG_TAG_DATE_PICKER);
+                break;
+            case R.id.eedit_endat_btn:
+                CalendarDatePickerDialogFragment cdp2 = new CalendarDatePickerDialogFragment()
+                        .setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
+                                String month  = ((monthOfYear + 1) < 10)? "0" + (monthOfYear + 1) : (monthOfYear+1)+"";
+                                String day = (dayOfMonth < 10)? "0" + dayOfMonth : "" + dayOfMonth;
+                                eeditEndat.setText(year + "-" + month + "-" + day);
+                            }
+                        })
+                        .setThemeLight();
+                cdp2.show(getActivity().getSupportFragmentManager(),FRAG_TAG_DATE_PICKER);
                 break;
             case R.id.eedit_starttime_btn:
                 RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
@@ -136,7 +166,7 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
                 break;
             case R.id.eedit_qrcode:
                 ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("qrcode", model.getQrcode_link());
+                ClipData clip = ClipData.newPlainText("qrcode", model.getQrCodeLink());
                 clipboard.setPrimaryClip(clip);
                 break;
             case R.id.eedit_back:
@@ -223,7 +253,26 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
 
     private void processEditEvent(){
         if (!isInputInvalid()){
+            Call<String> call =api.updateEvent(eeditName.getText().toString(),
+                    eeditDescription.getText().toString(),
+                    eeditStartat.getText().toString() + " " + eeditStarttime.getText().toString(),
+                    eeditStartat.getText().toString() + " " + eeditStarttime.getText().toString(),
+                    isUserSelectNewImage ? RequestBody.create(MediaType.parse("multipart/form-data"), imagePath) : null);
 
+
+            //RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), imagePath);
+
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Response<String> response, Retrofit retrofit) {
+
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+
+                }
+            });
         }else{
             Toast.makeText(getActivity(),"Your event name and description could not be blank !", Toast.LENGTH_SHORT).show();
         }
@@ -242,13 +291,16 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
     }
 
     private static final int SELECT_PICTURE = 1;
+    String imagePath;
+    File uploadFile;
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == SELECT_PICTURE) {
                 Uri selectedImageUri = data.getData();
                 Picasso.with(getContext()).load(selectedImageUri).into(eeditImg);
-                String imagePath = getRealPathFromURI(selectedImageUri);
-
+                imagePath = selectedImageUri.getPath();
+                uploadFile = new File(selectedImageUri.getPath());
+                isUserSelectNewImage = true;
             }
         }
     }
@@ -292,9 +344,7 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
 
     @Override
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-        String month  = ((monthOfYear + 1) < 10)? "0" + (monthOfYear + 1) : (monthOfYear+1)+"";
-        String day = (dayOfMonth < 10)? "0" + dayOfMonth : "" + dayOfMonth;
-        eeditStartat.setText(year + "-" + month + "-" + day);
+
     }
 
     @Override
@@ -366,11 +416,11 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
                     eeditTitle.setText(getResources().getString(R.string.edit_your_event) + model.getName());
                     eeditName.setText(model.getName());
                     eeditDescription.setText(model.getDescription());
-                    eeditStartat.setText(model.getCreated_date().split(" ")[0]);
-                    eeditStarttime.setText(model.getCreated_date().split(" ")[1]);
-                    Picasso.with(getContext()).load(model.getImage_link()).error(R.drawable.side_nav_bar)
+                    /*eeditStartat.setText(model.getCreated_date().split(" ")[0]);
+                    eeditStarttime.setText(model.getCreated_date().split(" ")[1]);*/
+                    Picasso.with(getContext()).load(model.getImageLink()).error(R.drawable.side_nav_bar)
                             .into(eeditImg);
-                    Picasso.with(getContext()).load(model.getImage_link()).error(R.drawable.side_nav_bar)
+                    Picasso.with(getContext()).load(model.getQrCodeLink()).error(R.drawable.side_nav_bar)
                             .into(eeditQrcode);
                 }else{
                     new NetworkFailBuilder(EditEventFragment.this.getContext())
