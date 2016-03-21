@@ -43,8 +43,7 @@ public class EventListFragment extends BaseFragment {
 
     EventListAdapter mAdapter;
     Event mModel;
-    //// TODO: 11/3/16 REMOVE FAKEBUILD
-    APIEndpoint api = APIService.fakebuild();
+    APIEndpoint api = APIService.build();
     LinearLayoutManager mLayoutManager;
 
     @Nullable
@@ -77,8 +76,7 @@ public class EventListFragment extends BaseFragment {
         mRecyclerView.setRefreshing(false);
         mRecyclerView.getEmptyView().findViewById(R.id.loading_progressbar).setVisibility(View.VISIBLE);
         mRecyclerView.showEmptyView();
-        //ToDo REPLACE WITH REAL SERVICE
-        Call<Event> call = api.getFakeEvent(user.getCode());
+        Call<Event> call = api.getEvents(Integer.parseInt(user.getCode()));
         call.enqueue(new MyCallBack(getContext(), new MyCallBack.IOnDataReceived() {
             @Override
             public void onReceived(Response response, Retrofit retrofit) {

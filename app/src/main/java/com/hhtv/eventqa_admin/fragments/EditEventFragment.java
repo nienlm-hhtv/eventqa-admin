@@ -61,6 +61,8 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
     TextView eeditStartat;
     @Bind(R.id.eedit_starttime)
     TextView eeditStarttime;
+    @Bind(R.id.eedit_endtime)
+    TextView eeditEndtime;
     @Bind(R.id.eedit_img)
     ImageView eeditImg;
     @Bind(R.id.eedit_qrcode)
@@ -73,6 +75,8 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
     Button eeditStartAtBtn;
     @Bind(R.id.eedit_starttime_btn)
     Button eeditStartTimeBTn;
+    @Bind(R.id.eedit_endtime_btn)
+    Button eeditEndTimeBTn;
     @Bind(R.id.eedit_delete)
     Button eeditDelete;
 
@@ -95,8 +99,27 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
                 break;
             case R.id.eedit_starttime_btn:
                 RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
-                        .setOnTimeSetListener(EditEventFragment.this);
+                        .setOnTimeSetListener(new RadialTimePickerDialogFragment.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
+                                String hour = (hourOfDay < 10)? "0" + hourOfDay : "" + hourOfDay;
+                                String min = (minute < 10)? "0" + minute : "" + minute;
+                                eeditStarttime.setText(hour + ":" +min + ":00");
+                            }
+                        });
                 rtpd.show(getActivity().getSupportFragmentManager(), FRAG_TAG_TIME_PICKER);
+                break;
+            case R.id.eedit_endtime_btn:
+                RadialTimePickerDialogFragment rtpd2 = new RadialTimePickerDialogFragment()
+                        .setOnTimeSetListener(new RadialTimePickerDialogFragment.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
+                                String hour = (hourOfDay < 10)? "0" + hourOfDay : "" + hourOfDay;
+                                String min = (minute < 10)? "0" + minute : "" + minute;
+                                eeditEndtime.setText(hour + ":" +min + ":00");
+                            }
+                        });
+                rtpd2.show(getActivity().getSupportFragmentManager(), FRAG_TAG_TIME_PICKER);
                 break;
             case R.id.eedit_img:
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -113,7 +136,7 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
                 break;
             case R.id.eedit_qrcode:
                 ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("qrcode", model.getQrCodeLink());
+                ClipData clip = ClipData.newPlainText("qrcode", model.getQrcode_link());
                 clipboard.setPrimaryClip(clip);
                 break;
             case R.id.eedit_back:
@@ -276,9 +299,7 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
 
     @Override
     public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
-        String hour = (hourOfDay < 10)? "0" + hourOfDay : "" + hourOfDay;
-        String min = (minute < 10)? "0" + minute : "" + minute;
-        eeditStarttime.setText(hour + ":" +min + ":00");
+
     }
     public enum ActionType {
         EDIT, CREATE
@@ -335,8 +356,8 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
         call.enqueue(new MyCallBack(getContext(), new MyCallBack.IOnDataReceived() {
             @Override
             public void onReceived(Response response, Retrofit retrofit) {
-                Log.d("MYTAG","call on: " + response.raw().request().url());
-                if (response.isSuccess() && ((Result)response.body()).isSuccess()){
+                Log.d("MYTAG2","call on: " + response.raw().request().url());
+                if (response.isSuccess()){
                     View v = inflater.inflate(R.layout.fragment_edit_event_main, container, false);
                     rootLayout.removeAllViews();
                     rootLayout.addView(v);
@@ -345,11 +366,11 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
                     eeditTitle.setText(getResources().getString(R.string.edit_your_event) + model.getName());
                     eeditName.setText(model.getName());
                     eeditDescription.setText(model.getDescription());
-                    eeditStartat.setText(model.getCreate_at().split(" ")[0]);
-                    eeditStarttime.setText(model.getCreate_at().split(" ")[1]);
-                    Picasso.with(getContext()).load(model.getImageLink()).error(R.drawable.side_nav_bar)
+                    eeditStartat.setText(model.getCreated_date().split(" ")[0]);
+                    eeditStarttime.setText(model.getCreated_date().split(" ")[1]);
+                    Picasso.with(getContext()).load(model.getImage_link()).error(R.drawable.side_nav_bar)
                             .into(eeditImg);
-                    Picasso.with(getContext()).load(model.getQrCodeLink()).error(R.drawable.side_nav_bar)
+                    Picasso.with(getContext()).load(model.getImage_link()).error(R.drawable.side_nav_bar)
                             .into(eeditQrcode);
                 }else{
                     new NetworkFailBuilder(EditEventFragment.this.getContext())

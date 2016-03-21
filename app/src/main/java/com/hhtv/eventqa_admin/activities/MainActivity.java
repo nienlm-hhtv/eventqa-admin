@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity
             EventListFragment eFragment = EventListFragment.newInstance(user);
             transaction.replace(R.id.main_framelayout, eFragment);
             transaction.commit();
-        } else if (id == R.id.nav_gallery) {
+        } /*else if (id == R.id.nav_gallery) {
             EditEventFragment editEventFragment = EditEventFragment.newInstance(user, EditEventFragment.ActionType.CREATE, -1);
             transaction.replace(R.id.main_framelayout, editEventFragment).addToBackStack("EditEventFragment");
             transaction.commit();
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity
             f = TestFragment.newInstance("share");
             transaction.replace(R.id.main_framelayout, f);
             transaction.commit();
-        } else if (id == R.id.nav_send) {
+        }*/ else if (id == R.id.nav_send) {
             new MaterialDialog.Builder(this)
                     .title("Confirm log out")
                     .content("Do you want to log out ?")

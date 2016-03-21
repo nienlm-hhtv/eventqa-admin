@@ -10,14 +10,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.hhtv.eventqa_admin.R;
+import com.hhtv.eventqa_admin.activities.EventDetailActivity;
 import com.hhtv.eventqa_admin.adapters.SimpleQuestionAdapter;
 import com.hhtv.eventqa_admin.api.APIEndpoint;
 import com.hhtv.eventqa_admin.api.APIService;
 import com.hhtv.eventqa_admin.helpers.DeviceUltis;
+import com.hhtv.eventqa_admin.helpers.NetworkFailBuilder;
+import com.hhtv.eventqa_admin.helpers.UserUtils;
 import com.hhtv.eventqa_admin.helpers.listener.IOnAdapterInteractListener;
+import com.hhtv.eventqa_admin.models.question.MarkQuestionResponse;
 import com.hhtv.eventqa_admin.models.question.Question;
 import com.hhtv.eventqa_admin.models.question.Result;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
@@ -50,8 +55,8 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
 
     SimpleQuestionAdapter mAdapter = null;
     GridLayoutManager gridLayoutManager;
-
-
+    APIEndpoint api = APIService.build();
+    MaterialDialog mDialog;
     public EventHighestVoteFragment() {
     }
 
@@ -110,6 +115,12 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
             }
         });
         processLoadQuestion(eventId, userId, true);
+        mDialog = new MaterialDialog.Builder(getContext())
+                .title("Please wait")
+                .content("performing your action...")
+                .progress(true, 0)
+                .cancelable(false).build();
+        processLoadQuestion(eventId, userId, true);
         return v;
     }
 
@@ -159,17 +170,84 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
 
     @Override
     public void onAnsBtnClick(int id) {
+        //mAdapter.removeItem(id);
+        mDialog.show();
+        Call<MarkQuestionResponse> call = api.markQuestionAnswered(UserUtils.getUserId(getContext()), id);
+        call.enqueue(new Callback<MarkQuestionResponse>() {
+            @Override
+            public void onResponse(Response<MarkQuestionResponse> response, Retrofit retrofit) {
+                mDialog.dismiss();
+                if (response.isSuccess()) {
+                    Log.d("MYTAG2","ans: " + response.raw().request().url());
+                    Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
+                    if (response.body().isSuccess()) {
+                        ((EventDetailActivity) getActivity()).reloadContent();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
+                }
+            }
 
+            @Override
+            public void onFailure(Throwable t) {
+                mDialog.dismiss();
+                new NetworkFailBuilder(getContext()).show();
+            }
+        });
     }
 
     @Override
     public void onDelBtnClick(int id) {
+        //mAdapter.removeItem(id);
+        mDialog.show();
+        Call<MarkQuestionResponse> call = api.markQuestionDeleted(UserUtils.getUserId(getContext()), id);
+        call.enqueue(new Callback<MarkQuestionResponse>() {
+            @Override
+            public void onResponse(Response<MarkQuestionResponse> response, Retrofit retrofit) {
+                mDialog.dismiss();
+                Log.d("MYTAG2","del: " + response.raw().request().url());
+                if (response.isSuccess()) {
+                    Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
+                    if (response.body().isSuccess()) {
+                        ((EventDetailActivity) getActivity()).reloadContent();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
+                }
+            }
 
+            @Override
+            public void onFailure(Throwable t) {
+                mDialog.dismiss(); new NetworkFailBuilder(getContext()).show();
+            }
+        });
     }
 
     @Override
     public void onDupBtnClick(int id) {
+        //mAdapter.removeItem(id);
+        mDialog.show();
+        Call<MarkQuestionResponse> call = api.markQuestionDuplicated(UserUtils.getUserId(getContext()), id);
+        call.enqueue(new Callback<MarkQuestionResponse>() {
+            @Override
+            public void onResponse(Response<MarkQuestionResponse> response, Retrofit retrofit) {
+                mDialog.dismiss();
+                Log.d("MYTAG2","dup: " + response.raw().request().url());
+                if (response.isSuccess()) {
+                    Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
+                    if (response.body().isSuccess()) {
+                        ((EventDetailActivity) getActivity()).reloadContent();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
+                }
+            }
 
+            @Override
+            public void onFailure(Throwable t) {
+                mDialog.dismiss(); new NetworkFailBuilder(getContext()).show();
+            }
+        });
     }
 
     @Override

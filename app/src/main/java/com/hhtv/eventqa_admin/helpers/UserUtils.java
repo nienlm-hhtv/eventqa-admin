@@ -32,6 +32,7 @@ public class UserUtils {
         editor.putInt("1", Integer.parseInt(user.getCode()));
         editor.putString("2", user.getUsername());
         editor.putString("3", user.getEmail());
+        editor.apply();
     }
 
     public static void logout(Context mContext){
@@ -40,6 +41,7 @@ public class UserUtils {
         editor.putInt("1", -1);
         editor.putString("2", "guest");
         editor.putString("3", "");
+        editor.apply();
     }
 
     public static  GetUserResponse getUser(Context mContext){

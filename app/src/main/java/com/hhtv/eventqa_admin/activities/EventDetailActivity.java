@@ -60,7 +60,6 @@ public class EventDetailActivity extends AppCompatActivity {
 
 
     public Result mModel;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

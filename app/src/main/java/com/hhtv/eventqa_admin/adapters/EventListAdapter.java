@@ -62,7 +62,7 @@ public class EventListAdapter extends UltimateViewAdapter<EventListAdapter.ViewH
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Result s = mModels.get(position);
         Picasso.with(mFragment.getContext())
-                .load(s.getImageLink())
+                .load(s.getImage_link())
                 .placeholder(R.drawable.side_nav_bar)
                 .error(R.drawable.side_nav_bar)
                 .into(holder.mEvlistitemImg);

@@ -12,13 +12,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.hhtv.eventqa_admin.R;
+import com.hhtv.eventqa_admin.activities.EventDetailActivity;
 import com.hhtv.eventqa_admin.adapters.SimpleQuestionAdapter;
 import com.hhtv.eventqa_admin.api.APIEndpoint;
 import com.hhtv.eventqa_admin.api.APIService;
 import com.hhtv.eventqa_admin.helpers.DeviceUltis;
+import com.hhtv.eventqa_admin.helpers.NetworkFailBuilder;
 import com.hhtv.eventqa_admin.helpers.UserUtils;
 import com.hhtv.eventqa_admin.helpers.listener.IOnAdapterInteractListener;
+import com.hhtv.eventqa_admin.models.question.MarkQuestionResponse;
 import com.hhtv.eventqa_admin.models.question.Question;
 import com.hhtv.eventqa_admin.models.question.Result;
 import com.hhtv.eventqa_admin.models.question.Vote;
@@ -26,8 +30,6 @@ import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +55,8 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
 
     @Bind(R.id.event_question_recycler_view)
     UltimateRecyclerView mRecyclerView;
-
-
+    MaterialDialog mDialog;
+    APIEndpoint api = APIService.build();
     SimpleQuestionAdapter mAdapter = null;
     GridLayoutManager gridLayoutManager;
     public EventQuestionFragment() {
@@ -97,8 +99,8 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    if (addedItems.size() > 0){
-                        Log.d("MYTAG","ONTOP");
+                    if (addedItems.size() > 0) {
+                        Log.d("MYTAG", "ONTOP");
                         mAdapter.insertNewItem(addedItems, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
                             @Override
                             public void onComplete() {
@@ -116,7 +118,12 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
 
             }
         });
-        processLoadQuestion(eventId, userId);
+        mDialog = new MaterialDialog.Builder(getContext())
+            .title("Please wait")
+            .content("performing your action...")
+            .progress(true, 0)
+            .cancelable(false).build();
+        processLoadQuestion(eventId, userId, true);
         return v;
     }
 
@@ -180,36 +187,101 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 + " url: " + response.raw().request().url();
     }
 
-    public void instantInsert(String body){
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-        String now = new DateTime(DateTimeZone.UTC).toString(dtf);
-        Result result = new Result(-1, "", body, now, -1, "", 0, 0, false, 1);
-        mAdapter.insert(mAdapter.getmModel(), result, 0);
-        gridLayoutManager.scrollToPosition(0);
-    }
 
 
     @Override
     public void onAnsBtnClick(int id) {
+        //mAdapter.removeItem(id);
+        mDialog.show();
+        Call<MarkQuestionResponse> call = api.markQuestionAnswered(UserUtils.getUserId(getContext()), id);
+        call.enqueue(new Callback<MarkQuestionResponse>() {
+            @Override
+            public void onResponse(Response<MarkQuestionResponse> response, Retrofit retrofit) {
+                mDialog.dismiss();
+                if (response.isSuccess()) {
+                    Log.d("MYTAG2","ans: " + response.raw().request().url());
+                    Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
+                    if (response.body().isSuccess()) {
+                        ((EventDetailActivity) getActivity()).reloadContent();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
+                }
+            }
 
+            @Override
+            public void onFailure(Throwable t) {
+                mDialog.dismiss();
+                new NetworkFailBuilder(getContext()).show();
+            }
+        });
     }
 
     @Override
     public void onDelBtnClick(int id) {
+        //mAdapter.removeItem(id);
+        mDialog.show();
+        Call<MarkQuestionResponse> call = api.markQuestionDeleted(UserUtils.getUserId(getContext()), id);
+        call.enqueue(new Callback<MarkQuestionResponse>() {
+            @Override
+            public void onResponse(Response<MarkQuestionResponse> response, Retrofit retrofit) {
+                mDialog.dismiss();
+                Log.d("MYTAG2","del: " + response.raw().request().url());
+                if (response.isSuccess()) {
+                    Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
+                    if (response.body().isSuccess()) {
+                        ((EventDetailActivity) getActivity()).reloadContent();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
+                }
+            }
 
+            @Override
+            public void onFailure(Throwable t) {
+                mDialog.dismiss(); new NetworkFailBuilder(getContext()).show();
+            }
+        });
     }
 
     @Override
     public void onDupBtnClick(int id) {
+        //mAdapter.removeItem(id);
+        mDialog.show();
+        Call<MarkQuestionResponse> call = api.markQuestionDuplicated(UserUtils.getUserId(getContext()), id);
+        call.enqueue(new Callback<MarkQuestionResponse>() {
+            @Override
+            public void onResponse(Response<MarkQuestionResponse> response, Retrofit retrofit) {
+                mDialog.dismiss();
+                Log.d("MYTAG2","dup: " + response.raw().request().url());
+                if (response.isSuccess()) {
+                    Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
+                    if (response.body().isSuccess()) {
+                        ((EventDetailActivity) getActivity()).reloadContent();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
+                }
+            }
 
+            @Override
+            public void onFailure(Throwable t) {
+                mDialog.dismiss(); new NetworkFailBuilder(getContext()).show();
+            }
+        });
     }
 
     @Override
     public void onItemClick(int id) {
 
     }
-
+    boolean isAdapterEmpty = true;
     public void processUpdateQuestion() {
+        if (isAdapterEmpty || mAdapter.getItemCount() == 0){
+            firstLoad = true;
+            processLoadQuestion(eventId, userId, false);
+            return;
+        }
         APIEndpoint api = APIService.build();
         Log.d("MYTAG","EQF update, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
 
@@ -233,7 +305,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                         @Override
                         public void onClick(View v) {
                             firstLoad = true;
-                            processLoadQuestion(eventId, userId);
+                            processLoadQuestion(eventId, userId, true);
                         }
                     });
                     mRecyclerView.showEmptyView();
@@ -256,7 +328,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
     ArrayList<Result> mModels;
 
     @DebugLog
-    public void processLoadQuestion(final int eventId, final int userid) {
+    public void processLoadQuestion(final int eventId, final int userid, boolean loading) {
         if (firstLoad) {
             firstLoad = false;
         } else {
@@ -264,10 +336,12 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
         }
         this.eventId = eventId;
         this.userId = userid;
-        mRecyclerView.getEmptyView().findViewById(R.id.loading_progressbar).setVisibility(View.VISIBLE);
-        ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.loading_message))
-                .setText(getResources().getString(R.string.loading));
-        mRecyclerView.showEmptyView();
+        if (loading){
+            mRecyclerView.getEmptyView().findViewById(R.id.loading_progressbar).setVisibility(View.VISIBLE);
+            ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.loading_message))
+                    .setText(getResources().getString(R.string.loading));
+            mRecyclerView.showEmptyView();
+        }
         APIEndpoint api = APIService.build();
         Call<Question> call = api.getAllQuestions(eventId, userid, DeviceUltis.getDeviceId(getContext()));
         call.enqueue(new Callback<Question>() {
@@ -283,7 +357,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                         @Override
                         public void onClick(View v) {
                             firstLoad = true;
-                            processLoadQuestion(eventId, userid);
+                            processLoadQuestion(eventId, userid, true);
                         }
                     });
                     mRecyclerView.showEmptyView();
@@ -306,7 +380,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                     @Override
                     public void onClick(View v) {
                         firstLoad = true;
-                        processLoadQuestion(eventId, userid);
+                        processLoadQuestion(eventId, userid, true);
                     }
                 });
             }

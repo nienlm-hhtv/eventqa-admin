@@ -86,6 +86,15 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         i.onComplete();
     }
 
+    public void removeItem(int id){
+        int p = isItemInModel(id);
+        if (p != -1){
+            remove(mModel, p);
+            Log.d("MYTAG2", "REMOVE on: " + p);
+        }
+        Log.d("MYTAG2", "REMOVE on: not found !");
+    }
+
     public void updatePosition(List<Result> newModels){
         boolean hasTop = false;
         for (int i = 0; i < newModels.size(); i++){

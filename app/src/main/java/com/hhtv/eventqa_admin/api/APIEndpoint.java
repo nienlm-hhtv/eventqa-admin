@@ -2,6 +2,7 @@ package com.hhtv.eventqa_admin.api;
 
 import com.hhtv.eventqa_admin.models.event.Event;
 import com.hhtv.eventqa_admin.models.event.Result;
+import com.hhtv.eventqa_admin.models.question.MarkQuestionResponse;
 import com.hhtv.eventqa_admin.models.question.Question;
 import com.hhtv.eventqa_admin.models.question.Vote;
 import com.hhtv.eventqa_admin.models.user.GetUserResponse;
@@ -38,8 +39,18 @@ public interface APIEndpoint {
     int userId,@Query("device_id") String deviceid);
 
 
-    //TODO remove fake method
+    @GET("/api/event/markQuestionAnswered")
+    Call<MarkQuestionResponse> markQuestionAnswered(@Query("user_id") int user_id, @Query("question_id") int question_id);
+    @GET("/api/event/markQuestionDeleted")
+    Call<MarkQuestionResponse> markQuestionDeleted(@Query("user_id") int user_id, @Query("question_id") int question_id);
+    @GET("/api/event/markQuestionDuplicated")
+    Call<MarkQuestionResponse> markQuestionDuplicated(@Query("user_id") int user_id, @Query("question_id") int question_id);
+    @GET("/api/event/getEvents")
+    Call<Event> getEvents(@Query("user_id") int user_id);
+
+
+    /*//TODO remove fake method
     @GET("/getEvent")
-    Call<Event> getFakeEvent(@Query("userid") String userId);
+    Call<Event> getFakeEvent(@Query("userid") String userId);*/
 
 }
