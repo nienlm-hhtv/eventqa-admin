@@ -20,7 +20,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.hhtv.eventqa_admin.R;
 import com.hhtv.eventqa_admin.fragments.EditEventFragment;
 import com.hhtv.eventqa_admin.fragments.EventListFragment;
-import com.hhtv.eventqa_admin.fragments.TestFragment;
 import com.hhtv.eventqa_admin.helpers.UserUtils;
 import com.hhtv.eventqa_admin.models.event.Result;
 import com.hhtv.eventqa_admin.models.user.GetUserResponse;
@@ -125,7 +124,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        TestFragment f;
+        //TestFragment f;
         if (id == R.id.nav_camera) {
             // Handle the camera action
             EventListFragment eFragment = EventListFragment.newInstance(user);
@@ -162,9 +161,7 @@ public class MainActivity extends AppCompatActivity
             }).show();
 
         } else{
-            f = TestFragment.newInstance(" ??? ");
-            transaction.replace(R.id.main_framelayout, f);
-            transaction.commit();
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

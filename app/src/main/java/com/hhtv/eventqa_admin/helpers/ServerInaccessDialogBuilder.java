@@ -6,13 +6,13 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 /**
- * Created by nienb on 18/3/16.
+ * Created by nienb on 24/3/16.
  */
-public class NetworkFailBuilder extends MaterialDialog.Builder {
-    public NetworkFailBuilder(Context context) {
+public class ServerInaccessDialogBuilder  extends MaterialDialog.Builder {
+    public ServerInaccessDialogBuilder(Context context) {
         super(context);
         this.title("Error");
-        this.content("There was problem with your network connection, or server is inaccessible. Please try again !");
+        this.content("Cannot access to server at the moment, please try later !");
         this.negativeText("Dismiss");
         this.onNegative(new MaterialDialog.SingleButtonCallback() {
             @Override
@@ -23,3 +23,4 @@ public class NetworkFailBuilder extends MaterialDialog.Builder {
     }
 
 }
+

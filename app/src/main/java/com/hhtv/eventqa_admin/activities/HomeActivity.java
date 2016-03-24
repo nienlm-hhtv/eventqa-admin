@@ -14,6 +14,7 @@ import com.hhtv.eventqa_admin.api.APIEndpoint;
 import com.hhtv.eventqa_admin.api.APIService;
 import com.hhtv.eventqa_admin.helpers.NetworkFailBuilder;
 import com.hhtv.eventqa_admin.helpers.UserUtils;
+import com.hhtv.eventqa_admin.helpers.ServerInaccessDialogBuilder;
 import com.hhtv.eventqa_admin.models.user.GetUserResponse;
 
 import org.parceler.Parcels;
@@ -42,6 +43,7 @@ public class HomeActivity extends AppCompatActivity {
 
     MaterialDialog loadingDialog, signinFailDialog;
     NetworkFailBuilder b;
+    ServerInaccessDialogBuilder s;
     APIEndpoint api = APIService.build();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +68,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 }).build();
         b = new NetworkFailBuilder(this);
+        s = new ServerInaccessDialogBuilder(this);
     }
 
     @OnClick({R.id.home_btn_login})
