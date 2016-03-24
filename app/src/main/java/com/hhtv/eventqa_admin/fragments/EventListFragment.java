@@ -80,7 +80,9 @@ public class EventListFragment extends BaseFragment {
         call.enqueue(new MyCallBack(getContext(), new MyCallBack.IOnDataReceived() {
             @Override
             public void onReceived(Response response, Retrofit retrofit) {
-
+                if(!isAdded()){
+                    return;
+                }
                 mModel = (Event) response.body();
                 Log.d("MYTAG", "received: " + mModel.toString());
                 if (mModel.getResults().size() > 0) {

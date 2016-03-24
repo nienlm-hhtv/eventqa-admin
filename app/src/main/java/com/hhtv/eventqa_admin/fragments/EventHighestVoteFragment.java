@@ -168,7 +168,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
     }
 
 
-    @Override
+    //@Override
     public void onAnsBtnClick(final int id) {
         //mAdapter.removeItem(id);
         mDialog.show();
@@ -178,11 +178,11 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
             public void onResponse(Response<MarkQuestionResponse> response, Retrofit retrofit) {
                 mDialog.dismiss();
                 if (response.isSuccess()) {
-                    Log.d("MYTAG2","ans: " + response.raw().request().url());
+                    Log.d("MYTAG2", "ans: " + response.raw().request().url());
                     Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
                     if (response.body().isSuccess()) {
                         mAdapter.removeItem(id);
-                        ((EventDetailActivity) getActivity()).reloadContent();
+                        ((EventDetailActivity) getActivity()).reloadContent(true);
                     }
                 } else {
                     Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
@@ -197,7 +197,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
         });
     }
 
-    @Override
+    //@Override
     public void onDelBtnClick(final int id) {
         //mAdapter.removeItem(id);
         mDialog.show();
@@ -211,7 +211,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                     mAdapter.removeItem(id);
                     Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
                     if (response.body().isSuccess()) {
-                        ((EventDetailActivity) getActivity()).reloadContent();
+                        ((EventDetailActivity) getActivity()).reloadContent(true);
                     }
                 } else {
                     Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
@@ -225,7 +225,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
         });
     }
 
-    @Override
+    //@Override
     public void onDupBtnClick(final int id) {
         //mAdapter.removeItem(id);
         mDialog.show();
@@ -239,7 +239,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                     mAdapter.removeItem(id);
                     Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
                     if (response.body().isSuccess()) {
-                        ((EventDetailActivity) getActivity()).reloadContent();
+                        ((EventDetailActivity) getActivity()).reloadContent(true);
                     }
                 } else {
                     Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
@@ -254,18 +254,11 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
     }
 
     @Override
-    public void onItemClick(int id) {
+    public void onItemClick(int id, int position) {
 
     }
 
-    @Override
-    public void scroll(int position) {
-        int firstVisible = gridLayoutManager.findFirstVisibleItemPosition();
-        //int lastVisible = gridLayoutManager.findLastVisibleItemPosition();
 
-        if (firstVisible < 2)
-            gridLayoutManager.scrollToPosition(0);
-    }
 
     int eventId = -1, userId = -1;
     boolean firstLoad = true;

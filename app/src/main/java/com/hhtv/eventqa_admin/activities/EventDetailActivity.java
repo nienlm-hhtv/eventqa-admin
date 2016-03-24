@@ -1,5 +1,6 @@
 package com.hhtv.eventqa_admin.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -9,14 +10,15 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.hhtv.eventqa_admin.R;
-import com.hhtv.eventqa_admin.fragments.EventHighestVoteFragment;
-import com.hhtv.eventqa_admin.fragments.EventQuestionFragment;
-import com.hhtv.eventqa_admin.helpers.UserUtils;
+import com.hhtv.eventqa_admin.fragments.EventHighestVoteFragment3;
+import com.hhtv.eventqa_admin.fragments.EventQuestionListFragment3;
 import com.hhtv.eventqa_admin.models.event.Result;
 
 import org.joda.time.DateTime;
@@ -63,7 +65,14 @@ public class EventDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mModel = Parcels.unwrap(getIntent().getParcelableExtra("event"));
+        if (mModel == null){
+            Toast.makeText(EventDetailActivity.this, getResources().getString(R.string.error_occur_pls_signin), Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(this, HomeActivity.class);
+            startActivity(i);
+            finish();
+        }
         setContentView(R.layout.activity_event_detail_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
@@ -87,15 +96,20 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     Timer mTimer;
-    final int TIMER_DELAY = 10 * 1000;
+    final int TIMER_DELAY = 5 * 1000;
 
     public void initTimer() {
         mTimer = new Timer();
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Log.d("MYTAG", "timer excecute at: " + DateTime.now().toString("hh:mm:ss"));
-                reloadContent();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("TIMER", "timer excecute at: " + DateTime.now().toString("hh:mm:ss"));
+                        reloadContent(false);
+                    }
+                });
             }
         }, TIMER_DELAY, TIMER_DELAY);
     }
@@ -106,23 +120,27 @@ public class EventDetailActivity extends AppCompatActivity {
             mTimer = null;
         }
     }
-    public void reloadContent(){
-        EventHighestVoteFragment hf = (EventHighestVoteFragment) ((ViewPagerAdapter) mPager.getAdapter())
+    public void reloadContent(boolean loading){
+        EventHighestVoteFragment3 hf = (EventHighestVoteFragment3) ((ViewPagerAdapter) mPager.getAdapter())
                 .getItem(0);
-        hf.processLoadQuestion(Integer.parseInt(mModel.getId()),
-                UserUtils.getUserId(this), false);
-        EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
+        hf.updateQuestionList(loading);
+        EventQuestionListFragment3 f = (EventQuestionListFragment3) ((ViewPagerAdapter) mPager.getAdapter())
                 .getItem(1);
-        f.processUpdateQuestion();
+        f.updateQuestion(loading);
+    }
+
+    public void reloadAllContent(){
+        EventHighestVoteFragment3 hf = (EventHighestVoteFragment3) ((ViewPagerAdapter) mPager.getAdapter())
+                .getItem(0);
+        hf.loadQuestionList();
+        EventQuestionListFragment3 f = (EventQuestionListFragment3) ((ViewPagerAdapter) mPager.getAdapter())
+                .getItem(1);
+        f.loadQuestionList();
     }
     private void setupViewPager(ViewPager viewPager) {
         final ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(EventHighestVoteFragment.newInstance(Integer.parseInt(mModel.getId()), UserUtils.getUserId(
-                EventDetailActivity.this
-        )), "ONE");
-        adapter.addFragment(EventQuestionFragment.newInstance(Integer.parseInt(mModel.getId()), UserUtils.getUserId(
-                EventDetailActivity.this
-        )), "TWO");
+        adapter.addFragment(EventHighestVoteFragment3.newInstance(Integer.parseInt(mModel.getId())), "ONE");
+        adapter.addFragment(EventQuestionListFragment3.newInstance(Integer.parseInt(mModel.getId())), "TWO");
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

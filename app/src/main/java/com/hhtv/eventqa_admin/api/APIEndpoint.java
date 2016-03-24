@@ -1,7 +1,7 @@
 package com.hhtv.eventqa_admin.api;
 
 import com.hhtv.eventqa_admin.models.event.Event;
-import com.hhtv.eventqa_admin.models.event.Result;
+import com.hhtv.eventqa_admin.models.event.Result2;
 import com.hhtv.eventqa_admin.models.question.MarkQuestionResponse;
 import com.hhtv.eventqa_admin.models.question.Question;
 import com.hhtv.eventqa_admin.models.question.Vote;
@@ -37,7 +37,7 @@ public interface APIEndpoint {
                              @Part("image")RequestBody image);
 
     @GET("/api/event/getEventDetail")
-    Call<Result> getEvent(@Query("id") int eventid);
+    Call<Result2> getEvent(@Query("id") int eventid);
 
 
     @GET("/api/event/getQuestions")

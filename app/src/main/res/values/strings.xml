@@ -48,4 +48,11 @@
     <string name="no_question_tap_to_retry">No questions, tap to retry !</string>
     <string name="do_you_want_to_exit">Do you want to exit ?</string>
     <string name="ev_not_found_or_wrong_qr">Network error or incorrect QR code, please try again !</string>
+    <string name="choose_your_action">Choose your action</string>
+    <string name="error_occur_pls_signin">Internal error occur. Please login and try again !</string>
+    <string-array name="question_action">
+        <item>Answer question</item>
+        <item>Delete question</item>
+        <item>Mark question as duplicated</item>
+    </string-array>
 </resources>

@@ -145,7 +145,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
             firstLoad = true;
     }
 
-    @Override
+    /*@Override
     public void scroll(int position) {
         int firstVisible = gridLayoutManager.findFirstVisibleItemPosition();
         int lastVisible = gridLayoutManager.findLastVisibleItemPosition();
@@ -155,7 +155,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
             gridLayoutManager.scrollToPosition(0);
         }
         Log.d("MYTAG", "f: " + firstVisible + " l: " + lastVisible + "p: " + position);
-    }
+    }*/
 
     public List<Result> addedItems = new ArrayList<>();
     public String updateData(final Response<Vote> response) {
@@ -171,7 +171,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                     @Override
                     public void onComplete() {
                         //mRecyclerView.scrollVerticallyTo(0);
-                        scroll(response.body().getNew_questions().size());
+                        //scroll(response.body().getNew_questions().size());
                     }
                 });
             }
@@ -189,7 +189,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
 
 
 
-    @Override
+    //@Override
     public void onAnsBtnClick(final int id) {
         //mAdapter.removeItem(id);
         mDialog.show();
@@ -200,10 +200,10 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 mDialog.dismiss();
                 if (response.isSuccess()) {
                     mAdapter.removeItem(id);
-                    Log.d("MYTAG2","ans: " + response.raw().request().url());
+                    Log.d("MYTAG2", "ans: " + response.raw().request().url());
                     Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
                     if (response.body().isSuccess()) {
-                        ((EventDetailActivity) getActivity()).reloadContent();
+                        ((EventDetailActivity) getActivity()).reloadContent(true);
                     }
                 } else {
                     Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
@@ -218,7 +218,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
         });
     }
 
-    @Override
+    //@Override
     public void onDelBtnClick(final int id) {
         //mAdapter.removeItem(id);
         mDialog.show();
@@ -232,7 +232,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                     mAdapter.removeItem(id);
                     Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
                     if (response.body().isSuccess()) {
-                        ((EventDetailActivity) getActivity()).reloadContent();
+                        ((EventDetailActivity) getActivity()).reloadContent(true);
                     }
                 } else {
                     Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
@@ -246,7 +246,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
         });
     }
 
-    @Override
+    //@Override
     public void onDupBtnClick(final int id) {
         //mAdapter.removeItem(id);
         mDialog.show();
@@ -260,7 +260,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                     mAdapter.removeItem(id);
                     Toast.makeText(getContext(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
                     if (response.body().isSuccess()) {
-                        ((EventDetailActivity) getActivity()).reloadContent();
+                        ((EventDetailActivity) getActivity()).reloadContent(true);
                     }
                 } else {
                     Toast.makeText(getContext(), "Error occur, please try again !", Toast.LENGTH_SHORT).show();
@@ -275,9 +275,10 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
     }
 
     @Override
-    public void onItemClick(int id) {
+    public void onItemClick(int id, int position) {
 
     }
+
     boolean isAdapterEmpty = true;
     public void processUpdateQuestion() {
         if (isAdapterEmpty || mAdapter.getItemCount() == 0){

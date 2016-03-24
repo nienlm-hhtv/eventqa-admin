@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         user = Parcels.unwrap(getIntent().getParcelableExtra("user"));
         if (user == null){
+            Toast.makeText(this, getResources().getString(R.string.error_occur_pls_signin), Toast.LENGTH_SHORT).show();
             Intent i = new Intent(this, HomeActivity.class);
             startActivity(i);
             finish();

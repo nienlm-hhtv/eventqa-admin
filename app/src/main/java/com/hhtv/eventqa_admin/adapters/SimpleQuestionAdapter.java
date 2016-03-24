@@ -103,7 +103,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
                 hasTop = true;
         }
         //if (hasTop)
-        mFragment.scroll(0);
+
         updateContent(newModels);
     }
 
@@ -257,7 +257,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         holder.mPostFrom.setText(android.text.format.DateFormat.format("dd/MM/yyyy hh:mm",
                 getPostDate(mModel.get(position).getcreate_at())));
         final int id = Integer.parseInt(holder.mId.getText().toString());
-        holder.mAnsBtn.setOnClickListener(new View.OnClickListener() {
+        /*holder.mAnsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mFragment.onAnsBtnClick(id);
@@ -274,7 +274,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
             public void onClick(View v) {
                 mFragment.onDupBtnClick(id);
             }
-        });
+        });*/
 
     }
 

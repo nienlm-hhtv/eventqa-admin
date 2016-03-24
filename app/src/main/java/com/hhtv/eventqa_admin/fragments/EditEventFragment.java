@@ -33,10 +33,8 @@ import com.hhtv.eventqa_admin.api.APIEndpoint;
 import com.hhtv.eventqa_admin.api.APIService;
 import com.hhtv.eventqa_admin.helpers.MyCallBack;
 import com.hhtv.eventqa_admin.helpers.NetworkFailBuilder;
-import com.hhtv.eventqa_admin.models.event.Result;
+import com.hhtv.eventqa_admin.models.event.Result2;
 import com.hhtv.eventqa_admin.models.user.GetUserResponse;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.RequestBody;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -45,7 +43,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import retrofit.Call;
-import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 
@@ -252,7 +249,7 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
     }
 
     private void processEditEvent(){
-        if (!isInputInvalid()){
+        /*if (!isInputInvalid()){
             Call<String> call =api.updateEvent(eeditName.getText().toString(),
                     eeditDescription.getText().toString(),
                     eeditStartat.getText().toString() + " " + eeditStarttime.getText().toString(),
@@ -275,7 +272,7 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
             });
         }else{
             Toast.makeText(getActivity(),"Your event name and description could not be blank !", Toast.LENGTH_SHORT).show();
-        }
+        }*/
     }
     private void processAddNewEvent(){
         if (!isInputInvalid()){
@@ -400,19 +397,22 @@ public class EditEventFragment extends BaseFragment implements CalendarDatePicke
 
 
     APIEndpoint api = APIService.build();
-    Result model;
+    Result2 model;
     private void prepareEditEventView(final LayoutInflater inflater, final ViewGroup container){
-        Call<Result> call = api.getEvent(eventId);
+        Call<Result2> call = api.getEvent(eventId);
         call.enqueue(new MyCallBack(getContext(), new MyCallBack.IOnDataReceived() {
             @Override
             public void onReceived(Response response, Retrofit retrofit) {
+                if (!isAdded()){
+                    return;
+                }
                 Log.d("MYTAG2","call on: " + response.raw().request().url());
                 if (response.isSuccess()){
                     View v = inflater.inflate(R.layout.fragment_edit_event_main, container, false);
                     rootLayout.removeAllViews();
                     rootLayout.addView(v);
                     ButterKnife.bind(EditEventFragment.this, rootLayout);
-                    model = (Result)response.body();
+                    model = (Result2)response.body();
                     eeditTitle.setText(getResources().getString(R.string.edit_your_event) + model.getName());
                     eeditName.setText(model.getName());
                     eeditDescription.setText(model.getDescription());

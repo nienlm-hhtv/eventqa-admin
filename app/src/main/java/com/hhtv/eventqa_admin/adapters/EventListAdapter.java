@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -62,7 +63,7 @@ public class EventListAdapter extends UltimateViewAdapter<EventListAdapter.ViewH
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Result s = mModels.get(position);
         Picasso.with(mFragment.getContext())
-                .load(s.getImageLink())
+                .load(s.getImage_link())
                 .placeholder(R.drawable.side_nav_bar)
                 .error(R.drawable.side_nav_bar)
                 .into(holder.mEvlistitemImg);
@@ -81,7 +82,7 @@ public class EventListAdapter extends UltimateViewAdapter<EventListAdapter.ViewH
                 holder.mEvlistitemStatus.setText(mFragment.getResources().getString(R.string.finished));
                 break;
         }
-        holder.mEvlistitemBtnview.setOnClickListener(new View.OnClickListener() {
+        holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mFragment.onViewBtnClicked(s);
@@ -112,7 +113,7 @@ public class EventListAdapter extends UltimateViewAdapter<EventListAdapter.ViewH
         @Bind(R.id.evlistitem_name)
         TextView mEvlistitemName;
         @Bind(R.id.evlistitem_btnedit)
-        TextView mEvlistitemBtnedit;
+        Button mEvlistitemBtnedit;
         @Bind(R.id.evlistitem_btnview)
         TextView mEvlistitemBtnview;
         @Bind(R.id.evlistitem_status)
